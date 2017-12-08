@@ -13,7 +13,7 @@ logging.info("If you want to skip this, just set the environment var")
 logging.info("TAIGA_SKIP_DB_CHECK=True on docker-compose.yml on <backend> service.")
 CONNECTION_STRING = "dbname='{}' user='{}' host='{}' password='{}'".format(
     '{{POSTGRES_USER}}',
-    '{{POSTGRES_USER}}',,
+    '{{POSTGRES_USER}}',
     '{{POSTGRES_SERVER}}',
     '{{POSTGRES_PASSWORD}}'
 )

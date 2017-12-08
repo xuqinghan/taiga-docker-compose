@@ -50,9 +50,10 @@ services:
         ports:
             - 8000:8000
         depends_on:
-            - pg_db    
-        #command: ['gunicorn', '-b', '0.0.0.0:8000', 'taiga.wsgi']
-        command: ["/bin/bash"]
+            - pg_db
+        # entrypoint: ["~/wait-for-postgres.sh", "pg_db", "~/scripts/entrypoint.sh"]
+        command: ['gunicorn', '-b', '0.0.0.0:8000', 'taiga.wsgi']
+
 
     # api:
     #     #restart: always

@@ -1,5 +1,6 @@
 from jinja2 import Template
 import os
+import shutil
 
 dir_base = os.path.split(os.path.realpath(__file__))[0]
 

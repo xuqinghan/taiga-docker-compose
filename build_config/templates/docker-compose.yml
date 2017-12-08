@@ -50,7 +50,8 @@ services:
         ports:
             - 8000:8000
         depends_on:
-            - {{POSTGRES_SERVER}}    
+            - {{POSTGRES_SERVER}}
+        # entrypoint: ["~/wait-for-postgres.sh", "{{POSTGRES_SERVER}}", "~/scripts/entrypoint.sh"]
         command: ['gunicorn', '-b', '0.0.0.0:8000', 'taiga.wsgi']
 
 

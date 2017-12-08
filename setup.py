@@ -1,6 +1,7 @@
 import yaml
 import build_config
 import subprocess
+import os
 
 def load_config(f_name):
 
@@ -29,8 +30,18 @@ config = load_config('./setup-config.yml')
 
 build_config.docker_compose(config)
 build_config.backend(config)
+
 #download taiga-back source code
-#build_config.download(config['BACKEND_GIT_REPO'], config['BACKEND_SRC_HOST'])
+
+src_path = '{0}/taiga-back'.format(config['BACKEND_SRC_HOST'])
+
+if (not os.path.exists(src_path)) or config['RE_CLONE_SRC_FROM_GIT']:
+    # source code not exists or need repeat git clone
+    build_config.download(config['BACKEND_GIT_REPO'], config['BACKEND_SRC_HOST'])
+    subprocess.run('docker stop taigadockercompose_api_1', shell=True)
+    subprocess.run('docker rm taigadockercompose_api_1', shell=True)
+    subprocess.run('docker rmi taigadockercompose_api', shell=True)
 
 #subprocess.run('docker-compose up', shell=True)
 #print(config['BACKEND_SRC_CONTAINER'])
+# docker run -itd -v /home/xuqinghan/taiga-docker-compose/backend/scripts:/scripts --name taigadockercompose_api_1 taigadockercompose_api

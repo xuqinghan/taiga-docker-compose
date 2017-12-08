@@ -36,15 +36,32 @@ WORKDIR /home/taiga/taiga-back
 RUN mkdir -p /home/taiga/taiga-back/media
 RUN mkdir -p /home/taiga/taiga-back/static
 
+
 #install with sudo
 # not pip3
 USER root
 RUN pip install -r requirements.txt
-USER taiga
 RUN python manage.py compilemessages
+#USER taiga
+RUN pip install django-environ
+# 
+# RUN chown -R taiga /scripts
+# RUN chmod +x /scripts/entrypoint.sh
 
-COPY ./scripts ~/scripts
-#RUN chmod +x ~/scripts/entrypoint.sh
+# #CMD ["/bin/ls", '~/scripts/']
+# #waitfor pg up
+RUN mkdir -p /scripts
+COPY wait-for-postgres.sh /wait-for-postgres.sh
+RUN chown -R taiga /wait-for-postgres.sh
+RUN chmod +x /wait-for-postgres.sh
 
-#CMD ["/bin/ls", '~/scripts/']
-CMD ['~/scripts/entrypoint.sh']
+RUN chown -R taiga /home/taiga/taiga-back \
+    && chown -R taiga /home/taiga/taiga-back/static
+
+#COPY ./scripts/entrypoint.sh /scripts/entrypoint.sh
+COPY ./scripts /scripts
+RUN chown -R taiga /scripts
+RUN chmod +x /scripts/entrypoint.sh
+
+# ENTRYPOINT ["/wait-for-postgres.sh", "pg_db", "/scripts/entrypoint.sh"]
+ENTRYPOINT ["/scripts/entrypoint.sh"]

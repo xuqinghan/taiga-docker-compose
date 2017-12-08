@@ -1,5 +1,7 @@
 TAIGA_HOSTNAME: 127.0.0.1
 
+RE_CLONE_SRC_FROM_GIT: False
+
 back_end:
   git-repo: https://github.com/taigaio/taiga-back.git
   SRC_HOST: ./backend/src
