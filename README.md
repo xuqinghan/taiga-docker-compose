@@ -1,4 +1,8 @@
-# deploy taiga by docker
+# deploy taiga in docker via one command:
+
+'''pip3 install jinja2
+python3 setup.py
+'''
 
 inspired by https://github.com/douglasmiranda/docker-taiga
 
@@ -13,8 +17,7 @@ https://github.com/taigaio/taiga-back/issues/958
 
 
 
-pip3 install jinja2
-python3 setup.py
+
 
 and src taiga-back need fix:
 
