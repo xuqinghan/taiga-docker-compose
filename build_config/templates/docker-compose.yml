@@ -1,0 +1,75 @@
+version: '3.4'
+
+services:
+    {{POSTGRES_SERVER}}:
+        image: postgres
+        environment:
+            POSTGRES_USER: {{POSTGRES_USER}}
+            POSTGRES_PASSWORD: {{POSTGRES_PASSWORD}}
+            
+        volumes:
+            - {{POSTGRES_VOLUMN_PATH}}:/var/lib/postgresql/data
+
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+            - 8080:8080
+
+    # redis:
+    #     image: redis
+
+    {{RABBITMQ_SERVER}}:
+        #restart: always
+        #build: rabbitmq/
+        image: rabbitmq:3-management
+        #hostname: rabbit-taiga
+        environment:
+            RABBITMQ_ERLANG_COOKIE: SWQOKODSQALRPCLNMEQG
+            #RABBITMQ_NODENAME: taiga
+            RABBITMQ_DEFAULT_USER: {{RABBITMQ_DEFAULT_USER}}
+            RABBITMQ_DEFAULT_PASS: {{RABBITMQ_DEFAULT_PASS}}
+            #RABBITMQ_DEFAULT_VHOST: taiga
+        ports:
+            - 15672:15672
+            # - "5672:5672"
+
+    api:
+        build: backend/
+        volumes:
+            - {{BACKEND_MEDIA_HOST}}:{{BACKEND_MEDIA_CONTAINER}}
+            - {{BACKEND_STATIC_HOST}}:{{BACKEND_STATIC_CONTAINER}}
+        environment:
+        # - DJANGO_ALLOWED_HOSTS=example.com,example2.com
+        # Must be in lowercase, because we are using in a json file <frontend> (conf.json)
+        # - TAIGA_PUBLIC_REGISTER_ENABLED=false
+        # - TAIGA_SSL=True
+            TAIGA_HOSTNAME: {{TAIGA_HOSTNAME}}
+        # - TAIGA_SKIP_DB_CHECK=True
+        # command: ['gunicorn', '--worker-class', 'gevent', '--workers', '10', '-b', '0.0.0.0:8000', 'taiga.wsgi']
+        ports:
+            - 8000:8000
+        depends_on:
+            - {{POSTGRES_SERVER}}    
+        command: ['gunicorn', '-b', '0.0.0.0:8000', 'taiga.wsgi']
+
+
+    # api:
+    #     #restart: always
+    #     stdin_open: true
+    #     tty: true
+    #     build: ./
+    #     image: celery-with-docker-compose:latest
+    #     volumes:
+    #         - ./app:/deploy/app
+    #     ports:
+    #         - "80:80"
+    #     command: ["/bin/bash"]
+
+    # celeryworker:
+    #     image: celery-with-docker-compose:latest
+    #     volumes:
+    #         - ./app:/deploy/app
+    #     command: ['celery', '-A', 'tasks', 'worker', '-c', '4', '--loglevel', 'info']
+    #     depends_on:
+    #         - rabbitmq

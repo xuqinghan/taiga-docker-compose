@@ -1,0 +1,50 @@
+FROM python
+LABEL author="xuqinghan"
+LABEL purpose = 'taibackend'
+
+# step by step following the offical doc:
+# https://taigaio.github.io/taiga-doc/dist/setup-production.html 
+
+RUN apt update
+RUN apt install -y build-essential binutils-doc autoconf flex bison libjpeg-dev
+RUN apt install -y libfreetype6-dev zlib1g-dev libzmq3-dev libgdbm-dev libncurses5-dev
+RUN apt install -y automake libtool libffi-dev curl git tmux gettext
+RUN apt install -y nginx
+RUN apt install -y libxml2-dev libxslt-dev
+RUN apt install -y libssl-dev libffi-dev
+RUN pip install circus
+RUN pip install gunicorn
+RUN pip install setuptools
+
+#ENV PYTHONIOENCODING=utf-8
+
+RUN adduser taiga
+RUN adduser taiga sudo
+#swttich user
+USER taiga
+
+RUN mkdir -p ~/logs
+RUN mkdir -p {{BACKEND_SRC_CONTAINER}}
+
+# source code
+COPY ./src/taiga-back {{BACKEND_SRC_CONTAINER}}
+#config
+COPY local.py {{BACKEND_SRC_CONTAINER}}/settings/local.py
+COPY celery_local.py {{BACKEND_SRC_CONTAINER}}/settings/celery_local.py
+
+WORKDIR {{BACKEND_SRC_CONTAINER}}
+RUN mkdir -p {{BACKEND_MEDIA_CONTAINER}}
+RUN mkdir -p {{BACKEND_STATIC_CONTAINER}}
+
+#install with sudo
+# not pip3
+USER root
+RUN pip install -r requirements.txt
+USER taiga
+RUN python manage.py compilemessages
+
+COPY ./scripts ~/scripts
+#RUN chmod +x ~/scripts/entrypoint.sh
+
+#CMD ["/bin/ls", '~/scripts/']
+CMD ['~/scripts/entrypoint.sh']

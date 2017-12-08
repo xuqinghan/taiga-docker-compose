@@ -1,0 +1,75 @@
+version: '3.4'
+
+services:
+    pg_db:
+        image: postgres
+        environment:
+            POSTGRES_USER: taiga
+            POSTGRES_PASSWORD: taiga
+            
+        volumes:
+            - ./db/postgres:/var/lib/postgresql/data
+
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+            - 8080:8080
+
+    # redis:
+    #     image: redis
+
+    rabbitmq:
+        #restart: always
+        #build: rabbitmq/
+        image: rabbitmq:3-management
+        #hostname: rabbit-taiga
+        environment:
+            RABBITMQ_ERLANG_COOKIE: SWQOKODSQALRPCLNMEQG
+            #RABBITMQ_NODENAME: taiga
+            RABBITMQ_DEFAULT_USER: taiga
+            RABBITMQ_DEFAULT_PASS: taiga
+            #RABBITMQ_DEFAULT_VHOST: taiga
+        ports:
+            - 15672:15672
+            # - "5672:5672"
+
+    api:
+        build: backend/
+        volumes:
+            - ./taiga-back/media:/home/taiga/taiga-back/media
+            - ./taiga-back/static:/home/taiga/taiga-back/static
+        environment:
+        # - DJANGO_ALLOWED_HOSTS=example.com,example2.com
+        # Must be in lowercase, because we are using in a json file <frontend> (conf.json)
+        # - TAIGA_PUBLIC_REGISTER_ENABLED=false
+        # - TAIGA_SSL=True
+            TAIGA_HOSTNAME: 127.0.0.1
+        # - TAIGA_SKIP_DB_CHECK=True
+        # command: ['gunicorn', '--worker-class', 'gevent', '--workers', '10', '-b', '0.0.0.0:8000', 'taiga.wsgi']
+        ports:
+            - 8000:8000
+        depends_on:
+            - pg_db    
+        #command: ['gunicorn', '-b', '0.0.0.0:8000', 'taiga.wsgi']
+        command: ["/bin/bash"]
+
+    # api:
+    #     #restart: always
+    #     stdin_open: true
+    #     tty: true
+    #     build: ./
+    #     image: celery-with-docker-compose:latest
+    #     volumes:
+    #         - ./app:/deploy/app
+    #     ports:
+    #         - "80:80"
+    #     command: ["/bin/bash"]
+
+    # celeryworker:
+    #     image: celery-with-docker-compose:latest
+    #     volumes:
+    #         - ./app:/deploy/app
+    #     command: ['celery', '-A', 'tasks', 'worker', '-c', '4', '--loglevel', 'info']
+    #     depends_on:
+    #         - rabbitmq

@@ -1,0 +1,18 @@
+TAIGA_HOSTNAME: 127.0.0.1
+
+back_end:
+  git-repo: https://github.com/taigaio/taiga-back.git
+  SRC_HOST: ./backend/src
+  SRC_CONTAINER: /home/taiga/taiga-back
+  DATA_HOST: ./taiga-back
+
+POSTGRES_SERVER: pg_db
+POSTGRES_USER: taiga
+POSTGRES_PASSWORD: taiga
+POSTGRES_VOLUMN_PATH: ./db/postgres
+
+RABBITMQ_SERVER: rabbitmq
+RABBITMQ_DEFAULT_USER: taiga
+RABBITMQ_DEFAULT_PASS: taiga
+
+
