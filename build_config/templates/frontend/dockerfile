@@ -1,0 +1,39 @@
+FROM nginx
+LABEL author="xuqinghan"
+LABEL purpose = 'taiga-frontend'
+
+RUN apt update
+#RUN apt install -y nginx supervisor
+RUN apt install -y supervisor
+
+#src
+RUN mkdir -p {{FRONTEND_SRC_CONTAINER}}
+WORKDIR {{FRONTEND_SRC_CONTAINER}}
+
+#conf.json
+COPY conf.json {{FRONTEND_SRC_CONTAINER}}/dist/conf.json
+
+#log
+RUN mkdir -p {{LOGS_CONTAINER}}
+
+
+#nginx
+#RUN rm /etc/nginx/sites-available/default
+COPY nginx_front.conf /etc/nginx/conf.d/taiga.conf
+# RUN ln -s /etc/nginx/sites-available/nginx_front.conf /etc/nginx/sites-enabled/nginx_front.conf
+
+RUN echo "daemon off;" >> /etc/nginx/nginx.conf
+
+#ENTRYPOINT ["/usr/sbin/nginx"]
+#CMD ["service", 'nginx', 'start']
+#CMD ["nginx", "-g", "daemon off;"]
+
+# Setup supervisord
+RUN mkdir -p /var/log/supervisor
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# COPY ./src/taiga-front-dist {{FRONTEND_SRC_CONTAINER}}
+# RUN chown -R nginx {{FRONTEND_SRC_CONTAINER}}
+
+CMD ["/usr/bin/supervisord"]
+#CMD ["/bin/bash"]

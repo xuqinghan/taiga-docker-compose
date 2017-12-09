@@ -39,14 +39,15 @@ def render_to_src_settings(f_name_base, config):
     template = util.load_template(f_name_template)
     #渲染
     content_str = template.render(config)
-    print(content_str)
+    #print(content_str)
     #保存
     f_name_src = 'backend/src/taiga-back/settings/{0}'.format(f_name_base)
     util.save_txt(f_name_src, content_str)
 
 
 def get_src(config):
-    src_path = '{0}/taiga-back'.format(config['BACKEND_SRC_HOST'])
+    src_path = '{0}/{1}'.format(
+        config['BACKEND_SRC_HOST'], config['back_end']['SRC_CONTAINER'])
 
     if (not os.path.exists(src_path)) or config['RE_CLONE_SRC_FROM_GIT']:
         # source code not exists or need repeat git clone
@@ -65,8 +66,9 @@ def backend(config):
 
     #docker image
     render('dockerfile', config)
+    #circus
     render('taiga.ini', config)
-    render('circus.conf', config)
+
     #等待db容器启动
     render('wait-for-postgres.sh', config)
     #首次执行 django配置 初始化数据库 

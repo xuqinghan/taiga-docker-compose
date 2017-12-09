@@ -1,0 +1,7 @@
+{
+    "url": "amqp://{{RABBITMQ_DEFAULT_USER}}:{{RABBITMQ_DEFAULT_PASS}}@{{RABBITMQ_SERVER}}:5672//",
+    "secret": "{{SECRET_KEY}}",
+    "webSocketServer": {
+        "port": {{EVENTS_PORT}}
+    }
+}

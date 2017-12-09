@@ -34,10 +34,10 @@ services:
             - 15672:15672
             # - "5672:5672"
 
-    api:
+    {{API_SERVER}}:
         build: backend/
         volumes:
-            #- {{BACKEND_SRC_HOST}}/taiga-back:{{BACKEND_SRC_CONTAINER}}
+            - {{LOGS_HOST}}:{{LOGS_CONTAINER}}
             - {{BACKEND_MEDIA_HOST}}:{{BACKEND_MEDIA_CONTAINER}}
             - {{BACKEND_STATIC_HOST}}:{{BACKEND_STATIC_CONTAINER}}
         environment:
@@ -49,29 +49,57 @@ services:
         # - TAIGA_SKIP_DB_CHECK=True
         # command: ['gunicorn', '--worker-class', 'gevent', '--workers', '10', '-b', '0.0.0.0:8000', 'taiga.wsgi']
         ports:
-            - 8000:8000
+            - {{BACKEND_PORT}}:{{BACKEND_PORT}}
         depends_on:
             - {{POSTGRES_SERVER}}
         # entrypoint: ["~/wait-for-postgres.sh", "{{POSTGRES_SERVER}}", "~/scripts/entrypoint.sh"]
-        command: ['gunicorn', '-b', '0.0.0.0:8000', 'taiga.wsgi']
+        # command: ['gunicorn', '-b', '0.0.0.0:{{BACKEND_PORT}}', 'taiga.wsgi']
+        command: ['/usr/bin/circusd']
 
+    frontend:
+        build: frontend/
+        volumes:
+            #- {{API_SERVER}}:ro
+            - {{FRONTEND_SRC_HOST}}:{{FRONTEND_SRC_CONTAINER}}
+            - {{LOGS_HOST}}:{{LOGS_CONTAINER}}
+            - {{BACKEND_MEDIA_HOST}}:{{BACKEND_MEDIA_CONTAINER}}
+            - {{BACKEND_STATIC_HOST}}:{{BACKEND_STATIC_CONTAINER}}
 
-    # api:
-    #     #restart: always
-    #     stdin_open: true
-    #     tty: true
-    #     build: ./
-    #     image: celery-with-docker-compose:latest
-    #     volumes:
-    #         - ./app:/deploy/app
-    #     ports:
-    #         - "80:80"
-    #     command: ["/bin/bash"]
+        # environment:
+        # Must be in lowercase, because we are using in a json file (conf.json)
+        #   - TAIGA_DEBUG=true
+        #   - TAIGA_API_URL="http://example.com/api/v1/"
+        #   - TAIGA_EVENTS_URL="ws://example.com/events"
+        # Must be in lowercase, because we are using in a json file (conf.json)
+        #   - TAIGA_PUBLIC_REGISTER_ENABLED=false
+        #   - DEFAULT_LANGUAGE="en"
+        ports:
+            - 80:80
+
+        #command: ["nginx", "-g", "daemon off;"]
+        depends_on:
+        # It would be better to add 'postgres' to 'depends_on' on 'backend' service
+        # but 'celeryworker' extends 'backend' and we cannot extend a service
+        # if it is using 'depends_on'.
+            - {{POSTGRES_SERVER}}
+            - {{API_SERVER}}
 
     # celeryworker:
-    #     image: celery-with-docker-compose:latest
-    #     volumes:
-    #         - ./app:/deploy/app
-    #     command: ['celery', '-A', 'tasks', 'worker', '-c', '4', '--loglevel', 'info']
+    #     image: taigadockercompose_api
+    #     entrypoint: []
+    #     command: ['celery', '-A', 'taiga', 'worker', '-c', '4', '--loglevel', 'info']
+    #     # command: ['celery', '-A', 'taiga', 'worker', '-P', 'gevent', '-c', '4', '--loglevel', 'info']
     #     depends_on:
-    #         - rabbitmq
+    #     #- redis
+    #         - {{RABBITMQ_SERVER}}
+
+    {{EVENT_SERVER}}:
+        build: events/
+        volumes:
+            - {{LOGS_HOST}}:{{LOGS_CONTAINER}}
+        # entrypoint: ['/scripts/entrypoint.sh']
+        # command: ['coffee', 'index.coffee']
+        ports:
+            - {{EVENTS_PORT}}:{{EVENTS_PORT}}
+        depends_on:
+            - {{RABBITMQ_SERVER}}

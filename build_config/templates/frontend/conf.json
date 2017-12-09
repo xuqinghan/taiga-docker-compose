@@ -1,0 +1,11 @@
+{
+    "api": "http://{{TAIGA_HOSTNAME}}/api/v1/",
+    "eventsUrl": "ws://{{TAIGA_HOSTNAME}}/events",
+    "debug": "true",
+    "publicRegisterEnabled": true,
+    "feedbackEnabled": true,
+    "privacyPolicyUrl": null,
+    "termsOfServiceUrl": null,
+    "maxUploadFileSize": null,
+    "contribPlugins": []
+}

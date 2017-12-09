@@ -1,6 +1,6 @@
 FROM python
 LABEL author="xuqinghan"
-LABEL purpose = 'taibackend'
+LABEL purpose = 'taiga-backend'
 
 # step by step following the offical doc:
 # https://taigaio.github.io/taiga-doc/dist/setup-production.html 
@@ -33,7 +33,7 @@ RUN adduser taiga sudo
 
 
 #USER taiga
-RUN mkdir -p ~/logs
+RUN mkdir -p {{LOGS_CONTAINER}}
 RUN mkdir -p {{BACKEND_MEDIA_CONTAINER}}
 RUN mkdir -p {{BACKEND_STATIC_CONTAINER}}
 RUN chown -R taiga {{BACKEND_MEDIA_CONTAINER}}
@@ -50,8 +50,7 @@ COPY wait-for-postgres.sh /wait-for-postgres.sh
 RUN chmod +x /wait-for-postgres.sh
 
 # Setup circus
-# COPY taiga.ini /etc/circus/conf.d/taiga.ini
-# COPY circus.conf /etc/init/circus.conf
+COPY taiga.ini /etc/circus/conf.d/taiga.ini
 #RUN service circusd restart
 RUN pip install django-environ
 

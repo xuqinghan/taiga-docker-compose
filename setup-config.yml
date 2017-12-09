@@ -1,13 +1,35 @@
 TAIGA_HOSTNAME: 127.0.0.1
+SECRET_KEY: aw3+t2r(8(0kkrhg8)gx6i96v5^kv%6cfep9wxfom0%7dy0m9e
+
 
 RE_CLONE_SRC_FROM_GIT: False
+
+HOME_TAIGA: /home/taiga
 
 back_end:
   git-repo: https://github.com/taigaio/taiga-back.git
   CONFIG_HOST: ./backend
   SRC_HOST: ./backend/src
-  SRC_CONTAINER: /home/taiga/taiga-back
+  SRC_CONTAINER: /taiga-back
   DATA_HOST: ./taiga-back
+  PORT: 8001
+API_SERVER: api
+
+front_end:
+  git-repo: https://github.com/taigaio/taiga-front-dist.git
+  CONFIG_HOST: ./frontend
+  SRC_BASE: ./frontend/src
+  BASENAME: taiga-front-dist
+
+
+events:
+  git-repo: https://github.com/taigaio/taiga-events.git
+  CONFIG_HOST: ./events
+  SRC_HOST: ./events/src
+  SRC_CONTAINER: /taiga-events
+  PORT: 8888
+EVENT_SERVER: events
+
 
 POSTGRES_SERVER: pg_db
 POSTGRES_USER: taiga

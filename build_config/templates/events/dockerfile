@@ -1,0 +1,29 @@
+FROM node
+LABEL author="xuqinghan"
+LABEL purpose = 'taiga-events'
+
+RUN mkdir /taiga_events
+WORKDIR /taiga_events
+
+
+RUN curl https://bootstrap.pypa.io/get-pip.py | python
+RUN apt-get update
+RUN apt install -y build-essential python-dev
+
+RUN pip install circus
+# coffee used in circus
+RUN npm install -g coffee-script
+
+RUN groupadd -r taiga && useradd -r -g taiga taiga
+
+RUN npm install --production && npm install -g coffee-script
+
+#conf.json
+COPY config.json {{EVENT_SRC_CONTAINER}}/config.json
+#circus
+COPY taiga-events.ini /etc/circus/conf.d/taiga-events.ini
+
+CMD ['/usr/bin/circusd']
+
+# RUN chown -R taiga /taiga_events \
+#     && chown -R taiga /scripts/

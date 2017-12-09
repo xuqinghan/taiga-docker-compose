@@ -106,5 +106,7 @@ backend/
 taiga-back/
 db/
 */src/
-
-
+frontend/
+!build_config/templates/frontend/
+events/
+!build_config/templates/events/

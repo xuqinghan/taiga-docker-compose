@@ -43,19 +43,21 @@ DATABASES = {
     }
 }
 
-
+SECRET_KEY = {{SECRET_KEY}}
 
 _HTTP = 'https' if env('TAIGA_SSL', cast=bool, default=False) else 'http'
 
 SITES = {
     "api": {
        "scheme": _HTTP,
-       "domain": "{{TAIGA_HOSTNAME}}:8000",
+       #"domain": "{{TAIGA_HOSTNAME}}:{{BACKEND_PORT}}",
+       "domain": "{{TAIGA_HOSTNAME}},
        "name": "api"
     },
     "front": {
       "scheme": _HTTP,
-      "domain": "{{TAIGA_HOSTNAME}}:9001",
+      #"domain": "{{TAIGA_HOSTNAME}}:9001",
+      "domain": "{{TAIGA_HOSTNAME}},
       "name": "front"
     },
 }
@@ -123,7 +125,7 @@ STATIC_ROOT = '{{BACKEND_STATIC_CONTAINER}}'
 ## REGISTRATION
 #########################################
 
-#PUBLIC_REGISTER_ENABLED = True
+PUBLIC_REGISTER_ENABLED = True
 
 # LIMIT ALLOWED DOMAINS FOR REGISTER AND INVITE
 # None or [] values in USER_EMAIL_ALLOWED_DOMAINS means allow any domain
@@ -175,3 +177,7 @@ STATIC_ROOT = '{{BACKEND_STATIC_CONTAINER}}'
 # to disable it and work in sync mode. You can find the celery
 # settings in settings/celery.py and settings/celery-local.py
 CELERY_ENABLED = True
+
+EVENTS_PUSH_BACKEND = "taiga.events.backends.rabbitmq.EventsPushBackend"
+EVENTS_PUSH_BACKEND_OPTIONS = {
+    "url": "amqp://{{RABBITMQ_DEFAULT_USER}}:{{RABBITMQ_DEFAULT_PASS}}@{{RABBITMQ_SERVER}}:5672//"}

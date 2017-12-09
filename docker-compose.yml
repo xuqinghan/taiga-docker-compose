@@ -37,7 +37,7 @@ services:
     api:
         build: backend/
         volumes:
-            #- /home/xuqinghan/dev/taiga-docker-compose/backend/src/taiga-back:/home/taiga/taiga-back
+            - /home/xuqinghan/dev/taiga-docker-compose/logs:/home/taiga/logs
             - /home/xuqinghan/dev/taiga-docker-compose/taiga-back/media:/home/taiga/media
             - /home/xuqinghan/dev/taiga-docker-compose/taiga-back/static:/home/taiga/static
         environment:
@@ -49,29 +49,57 @@ services:
         # - TAIGA_SKIP_DB_CHECK=True
         # command: ['gunicorn', '--worker-class', 'gevent', '--workers', '10', '-b', '0.0.0.0:8000', 'taiga.wsgi']
         ports:
-            - 8000:8000
+            - 8001:8001
         depends_on:
             - pg_db
         # entrypoint: ["~/wait-for-postgres.sh", "pg_db", "~/scripts/entrypoint.sh"]
-        command: ['gunicorn', '-b', '0.0.0.0:8000', 'taiga.wsgi']
+        # command: ['gunicorn', '-b', '0.0.0.0:8001', 'taiga.wsgi']
+        command: ['/usr/bin/circusd']
 
+    frontend:
+        build: frontend/
+        volumes:
+            #- api:ro
+            - /home/xuqinghan/dev/taiga-docker-compose/frontend/src/taiga-front-dist:/home/taiga/taiga-front-dist
+            - /home/xuqinghan/dev/taiga-docker-compose/logs:/home/taiga/logs
+            - /home/xuqinghan/dev/taiga-docker-compose/taiga-back/media:/home/taiga/media
+            - /home/xuqinghan/dev/taiga-docker-compose/taiga-back/static:/home/taiga/static
 
-    # api:
-    #     #restart: always
-    #     stdin_open: true
-    #     tty: true
-    #     build: ./
-    #     image: celery-with-docker-compose:latest
-    #     volumes:
-    #         - ./app:/deploy/app
-    #     ports:
-    #         - "80:80"
-    #     command: ["/bin/bash"]
+        # environment:
+        # Must be in lowercase, because we are using in a json file (conf.json)
+        #   - TAIGA_DEBUG=true
+        #   - TAIGA_API_URL="http://example.com/api/v1/"
+        #   - TAIGA_EVENTS_URL="ws://example.com/events"
+        # Must be in lowercase, because we are using in a json file (conf.json)
+        #   - TAIGA_PUBLIC_REGISTER_ENABLED=false
+        #   - DEFAULT_LANGUAGE="en"
+        ports:
+            - 80:80
+
+        #command: ["nginx", "-g", "daemon off;"]
+        depends_on:
+        # It would be better to add 'postgres' to 'depends_on' on 'backend' service
+        # but 'celeryworker' extends 'backend' and we cannot extend a service
+        # if it is using 'depends_on'.
+            - pg_db
+            - api
 
     # celeryworker:
-    #     image: celery-with-docker-compose:latest
-    #     volumes:
-    #         - ./app:/deploy/app
-    #     command: ['celery', '-A', 'tasks', 'worker', '-c', '4', '--loglevel', 'info']
+    #     image: taigadockercompose_api
+    #     entrypoint: []
+    #     command: ['celery', '-A', 'taiga', 'worker', '-c', '4', '--loglevel', 'info']
+    #     # command: ['celery', '-A', 'taiga', 'worker', '-P', 'gevent', '-c', '4', '--loglevel', 'info']
     #     depends_on:
+    #     #- redis
     #         - rabbitmq
+
+    events:
+        build: events/
+        volumes:
+            - /home/xuqinghan/dev/taiga-docker-compose/logs:/home/taiga/logs
+        # entrypoint: ['/scripts/entrypoint.sh']
+        # command: ['coffee', 'index.coffee']
+        ports:
+            - 8888:8888
+        depends_on:
+            - rabbitmq
