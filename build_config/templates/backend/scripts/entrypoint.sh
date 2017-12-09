@@ -1,15 +1,17 @@
 #!/bin/bash
 set -e
 
-# Setup database automatically if needed
+
 #if [ -z "$TAIGA_SKIP_DB_CHECK" ]; then
 DB_CHECK_STATUS=$(python /scripts/checkdb.py)
 if [[ $DB_CHECK_STATUS == "missing_django_migrations" ]]; then
+  # Setup database automatically if needed
   echo "Configuring initial database"
   python {{BACKEND_SRC_CONTAINER}}/manage.py migrate --noinput
   python {{BACKEND_SRC_CONTAINER}}/manage.py loaddata initial_user
   python {{BACKEND_SRC_CONTAINER}}/manage.py loaddata initial_project_templates
-  #python {{BACKEND_SRC_CONTAINER}}/manage.py loaddata initial_role
+  python {{BACKEND_SRC_CONTAINER}}/manage.py compilemessages
+  python {{BACKEND_SRC_CONTAINER}}/manage.py sample_data
 fi
 #fi
 
@@ -17,5 +19,7 @@ fi
 if [ "$(ls -A {{BACKEND_STATIC_CONTAINER}} 2> /dev/null)" == "" ]; then
   python {{BACKEND_SRC_CONTAINER}}/manage.py collectstatic --noinput
 fi
+
+
 
 exec "$@"

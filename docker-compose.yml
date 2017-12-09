@@ -37,8 +37,9 @@ services:
     api:
         build: backend/
         volumes:
-            - ./taiga-back/media:/home/taiga/taiga-back/media
-            - ./taiga-back/static:/home/taiga/taiga-back/static
+            - /home/xuqinghan/dev/taiga-docker-compose/backend/src:/home/taiga/taiga-back
+            - /home/xuqinghan/dev/taiga-docker-compose/taiga-back/media:/home/taiga/taiga-back/media
+            - /home/xuqinghan/dev/taiga-docker-compose/taiga-back/static:/home/taiga/taiga-back/static
         environment:
         # - DJANGO_ALLOWED_HOSTS=example.com,example2.com
         # Must be in lowercase, because we are using in a json file <frontend> (conf.json)

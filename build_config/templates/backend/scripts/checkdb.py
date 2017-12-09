@@ -2,10 +2,7 @@ import sys
 import time
 import psycopg2
 import logging
-import environ
 
-
-env = environ.Env()
 
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 logging.info("Checking if table 'django_migrations' exists.")
@@ -17,8 +14,8 @@ CONNECTION_STRING = "dbname='{}' user='{}' host='{}' password='{}'".format(
     '{{POSTGRES_SERVER}}',
     '{{POSTGRES_PASSWORD}}'
 )
-LIMIT_RETRIES = env('TAIGA_DB_CHECK_LIMIT_RETRIES', cast=int, default=5)
-SLEEP_INTERVAL = env('TAIGA_DB_CHECK_SLEEP_INTERVAL', cast=float, default=5)
+LIMIT_RETRIES = 5
+SLEEP_INTERVAL = 5
 
 
 def postgres_connection(connection_string, retry_counter=1):

@@ -24,6 +24,7 @@ def load_template(f_name_base):
 def save_txt(f_name_base, content_str):
     '''保存在当前工作路径'''
     f_name = '{0}/{1}'.format(os.getcwd(), f_name_base)
+    print('save ', f_name)
     #文件夹,如果不存在先创建
     build_dir(os.path.dirname(f_name))
     #创建文件
@@ -36,8 +37,12 @@ def render(f_name_base, config):
     template = load_template(f_name_base)
     #渲染
     content_str = template.render(config)
-    print(content_str)
+    #print(content_str)
     #保存
     save_txt(f_name_base, content_str)
 
-
+def copy_file(f_name_src, f_name_dest,config):
+    '''复制，前后名字不一样'''
+    f_name_src = '{0}/templates/{1}'.format(dir_base, f_name_src)
+    f_name_dest = '{0}/{1}'.format(os.getcwd(), f_name_dest)
+    os.popen('cp {0} {1}'.format(f_name_src, f_name_dest))

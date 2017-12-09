@@ -4,6 +4,7 @@ LABEL purpose = 'taibackend'
 
 # step by step following the offical doc:
 # https://taigaio.github.io/taiga-doc/dist/setup-production.html 
+ENV PYTHONIOENCODING=utf-8
 
 RUN apt update
 RUN apt install -y build-essential binutils-doc autoconf flex bison libjpeg-dev
@@ -12,57 +13,52 @@ RUN apt install -y automake libtool libffi-dev curl git tmux gettext
 RUN apt install -y nginx
 RUN apt install -y libxml2-dev libxslt-dev
 RUN apt install -y libssl-dev libffi-dev
+
+RUN pip install setuptools
 RUN pip install circus
 RUN pip install gunicorn
-RUN pip install setuptools
 
-#ENV PYTHONIOENCODING=utf-8
 
+RUN mkdir -p {{BACKEND_SRC_CONTAINER}}
+WORKDIR {{BACKEND_SRC_CONTAINER}}
+#only copy requirements.txt. other code will be mounted by -v
+# COPY {{BACKEND_SRC_HOST}}/taiga-back/requirements.txt {{BACKEND_SRC_CONTAINER}}/requirements.txt
+COPY ./src/taiga-back/requirements.txt requirements.txt
+
+
+RUN pip install -r requirements.txt
+
+#swttich user
 RUN adduser taiga
 RUN adduser taiga sudo
-#swttich user
 USER taiga
+RUN chown -R taiga {{BACKEND_SRC_CONTAINER}}
+
+# #django config be mount by -v
+# COPY local.py ./settings/local.py
+# COPY celery_local.py ./settings/celery_local.py
+
 
 RUN mkdir -p ~/logs
-RUN mkdir -p {{BACKEND_SRC_CONTAINER}}
-
-# source code
-COPY ./src/taiga-back {{BACKEND_SRC_CONTAINER}}
-#config
-COPY local.py {{BACKEND_SRC_CONTAINER}}/settings/local.py
-COPY celery_local.py {{BACKEND_SRC_CONTAINER}}/settings/celery_local.py
-
-WORKDIR {{BACKEND_SRC_CONTAINER}}
 RUN mkdir -p {{BACKEND_MEDIA_CONTAINER}}
 RUN mkdir -p {{BACKEND_STATIC_CONTAINER}}
+#    && chown -R taiga {{BACKEND_STATIC_CONTAINER}}
 
-
-#install with sudo
-# not pip3
-USER root
-RUN pip install -r requirements.txt
-RUN python manage.py compilemessages
-#USER taiga
-RUN pip install django-environ
-# 
-# RUN chown -R taiga /scripts
-# RUN chmod +x /scripts/entrypoint.sh
-
-# #CMD ["/bin/ls", '~/scripts/']
-# #waitfor pg up
+# .sh and .py for connect pg_db and first run manager.py
 RUN mkdir -p /scripts
-COPY wait-for-postgres.sh /wait-for-postgres.sh
-RUN chown -R taiga /wait-for-postgres.sh
-RUN chmod +x /wait-for-postgres.sh
-
-RUN chown -R taiga {{BACKEND_SRC_CONTAINER}} \
-    && chown -R taiga {{BACKEND_STATIC_CONTAINER}}
-
-#COPY ./scripts/entrypoint.sh /scripts/entrypoint.sh
 COPY ./scripts /scripts
 RUN chown -R taiga /scripts
 RUN chmod +x /scripts/entrypoint.sh
 
-# ENTRYPOINT ["/wait-for-postgres.sh", "{{POSTGRES_SERVER}}", "/scripts/entrypoint.sh"]
+COPY wait-for-postgres.sh /wait-for-postgres.sh
+#RUN chown -R taiga /wait-for-postgres.sh
+RUN chmod +x /wait-for-postgres.sh
+
+# Setup circus
+COPY taiga.ini /etc/circus/conf.d/taiga.ini
+RUN service circusd restart
+
+
+#first run
 ENTRYPOINT ["/scripts/entrypoint.sh"]
 
