@@ -30,6 +30,9 @@ def copy_taiga_ini(config):
     util.copy_file(f_name_src, f_name_dest, config)
 
 
+
+
+
 def render_to_src_settings(f_name_base, config):
     #加载模板
     f_name_template = 'backend/settings/{0}'.format(f_name_base)
@@ -62,6 +65,8 @@ def backend(config):
 
     #docker image
     render('dockerfile', config)
+    render('taiga.ini', config)
+    render('circus.conf', config)
     #等待db容器启动
     render('wait-for-postgres.sh', config)
     #首次执行 django配置 初始化数据库 

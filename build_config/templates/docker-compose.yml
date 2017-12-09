@@ -37,7 +37,7 @@ services:
     api:
         build: backend/
         volumes:
-            - {{BACKEND_SRC_HOST}}:{{BACKEND_SRC_CONTAINER}}
+            #- {{BACKEND_SRC_HOST}}/taiga-back:{{BACKEND_SRC_CONTAINER}}
             - {{BACKEND_MEDIA_HOST}}:{{BACKEND_MEDIA_CONTAINER}}
             - {{BACKEND_STATIC_HOST}}:{{BACKEND_STATIC_CONTAINER}}
         environment:

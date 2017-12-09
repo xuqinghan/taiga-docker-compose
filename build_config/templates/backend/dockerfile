@@ -18,31 +18,26 @@ RUN pip install setuptools
 RUN pip install circus
 RUN pip install gunicorn
 
-
 RUN mkdir -p {{BACKEND_SRC_CONTAINER}}
 WORKDIR {{BACKEND_SRC_CONTAINER}}
 #only copy requirements.txt. other code will be mounted by -v
-# COPY {{BACKEND_SRC_HOST}}/taiga-back/requirements.txt {{BACKEND_SRC_CONTAINER}}/requirements.txt
-COPY ./src/taiga-back/requirements.txt requirements.txt
+COPY ./src/taiga-back/requirements.txt ./requirements.txt
 
 
-RUN pip install -r requirements.txt
+RUN pip install -r ./requirements.txt
 
-#swttich user
+#add user taiga
 RUN adduser taiga
 RUN adduser taiga sudo
-USER taiga
-RUN chown -R taiga {{BACKEND_SRC_CONTAINER}}
-
-# #django config be mount by -v
-# COPY local.py ./settings/local.py
-# COPY celery_local.py ./settings/celery_local.py
 
 
+
+#USER taiga
 RUN mkdir -p ~/logs
 RUN mkdir -p {{BACKEND_MEDIA_CONTAINER}}
 RUN mkdir -p {{BACKEND_STATIC_CONTAINER}}
-#    && chown -R taiga {{BACKEND_STATIC_CONTAINER}}
+RUN chown -R taiga {{BACKEND_MEDIA_CONTAINER}}
+RUN chown -R taiga {{BACKEND_STATIC_CONTAINER}}
 
 # .sh and .py for connect pg_db and first run manager.py
 RUN mkdir -p /scripts
@@ -55,10 +50,14 @@ COPY wait-for-postgres.sh /wait-for-postgres.sh
 RUN chmod +x /wait-for-postgres.sh
 
 # Setup circus
-COPY taiga.ini /etc/circus/conf.d/taiga.ini
-RUN service circusd restart
+# COPY taiga.ini /etc/circus/conf.d/taiga.ini
+# COPY circus.conf /etc/init/circus.conf
+#RUN service circusd restart
+RUN pip install django-environ
 
-
+COPY ./src/taiga-back {{BACKEND_SRC_CONTAINER}}
+RUN chown -R taiga {{BACKEND_SRC_CONTAINER}}
+#USER taiga
 #first run
 ENTRYPOINT ["/scripts/entrypoint.sh"]
 

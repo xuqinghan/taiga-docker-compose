@@ -14,8 +14,8 @@ def load_config(f_name):
     config['BACKEND_CONFIG_HOST'] = os.path.abspath(config['back_end']['CONFIG_HOST'])
     config['BACKEND_SRC_HOST'] = os.path.abspath(config['back_end']['SRC_HOST'])
     config['BACKEND_SRC_CONTAINER'] = os.path.abspath(config['back_end']['SRC_CONTAINER'])
-    config['BACKEND_MEDIA_CONTAINER'] = '{0}/media'.format(config['BACKEND_SRC_CONTAINER'])
-    config['BACKEND_STATIC_CONTAINER'] = '{0}/static'.format(config['BACKEND_SRC_CONTAINER'])
+    config['BACKEND_MEDIA_CONTAINER'] = '{0}/media'.format('/home/taiga')
+    config['BACKEND_STATIC_CONTAINER'] = '{0}/static'.format('/home/taiga')
     config['DATA_HOST'] = os.path.abspath(config['back_end']['DATA_HOST'])
     config['BACKEND_MEDIA_HOST'] = '{0}/media'.format(config['DATA_HOST'])
     config['BACKEND_STATIC_HOST'] = '{0}/static'.format(config['DATA_HOST'])
@@ -24,6 +24,7 @@ def load_config(f_name):
 
 config = load_config('./setup-config.yml')
 
+print(config['BACKEND_MEDIA_HOST'])
 
 #config['TAIGA_HOSTNAME'] = '192.168.239.129'
 

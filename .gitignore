@@ -102,6 +102,9 @@ ENV/
 
 
 backend/
+!build_config/templates/backend/
 taiga-back/
 db/
 */src/
+
+
