@@ -13,9 +13,9 @@ RUN apt install -y automake libtool libffi-dev curl git tmux gettext
 RUN apt install -y nginx
 RUN apt install -y libxml2-dev libxslt-dev
 RUN apt install -y libssl-dev libffi-dev
+RUN apt install circus
 
 RUN pip install setuptools
-RUN pip install circus
 RUN pip install gunicorn
 
 RUN mkdir -p {{BACKEND_SRC_CONTAINER}}

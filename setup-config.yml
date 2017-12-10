@@ -16,19 +16,20 @@ back_end:
 API_SERVER: api
 
 front_end:
+  BASENAME: taiga-front-dist
   git-repo: https://github.com/taigaio/taiga-front-dist.git
   CONFIG_HOST: ./frontend
   SRC_BASE: ./frontend/src
-  BASENAME: taiga-front-dist
+
 
 
 events:
+  BASENAME: taiga-events
   git-repo: https://github.com/taigaio/taiga-events.git
   CONFIG_HOST: ./events
-  SRC_HOST: ./events/src
-  SRC_CONTAINER: /taiga-events
+  SRC_BASE: ./events/src
   PORT: 8888
-EVENT_SERVER: events
+EVENTS_SERVER: events
 
 
 POSTGRES_SERVER: pg_db

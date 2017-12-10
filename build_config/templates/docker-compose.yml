@@ -93,9 +93,10 @@ services:
     #     #- redis
     #         - {{RABBITMQ_SERVER}}
 
-    {{EVENT_SERVER}}:
+    {{EVENTS_SERVER}}:
         build: events/
         volumes:
+            - {{EVENTS_SRC_HOST}}:{{EVENTS_SRC_CONTAINER}}
             - {{LOGS_HOST}}:{{LOGS_CONTAINER}}
         # entrypoint: ['/scripts/entrypoint.sh']
         # command: ['coffee', 'index.coffee']

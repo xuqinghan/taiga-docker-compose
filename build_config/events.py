@@ -1,7 +1,7 @@
 from . import util
 import os
 from . import download_src
-import subprocess
+
 
 
 def render(f_name_base, config):
@@ -11,23 +11,27 @@ def render(f_name_base, config):
 
 
 def get_src(config):
-    src_path = '{0}/{1}'.format(config['EVENTS_SRC_HOST'],
-                                config['events']['SRC_CONTAINER'])
 
-    if (not os.path.exists(src_path)) or config['RE_CLONE_SRC_FROM_GIT']:
+    if (not os.path.exists(config['EVENTS_SRC_HOST'])) or config['RE_CLONE_SRC_FROM_GIT']:
         # source code not exists or need repeat git clone
         download_src.download(
-            config['EVENTS_GIT_REPO'], config['EVENTS_SRC_HOST'])
+            config['EVENTS_GIT_REPO'], config['EVENTS_SRC_HOST_BASE'])
         # subprocess.run('docker stop taigadockercompose_api_1', shell=True)
         # subprocess.run('docker rm taigadockercompose_api_1', shell=True)
         # subprocess.run('docker rmi taigadockercompose_api', shell=True)
+
+
+
 
 
 def events(config):
     '''taiga events需要的配置文件'''
     #如果不存在，创建  配置文件根目录
     util.build_dir(config['EVENTS_CONFIG_HOST'])
-
+    #for circus
+    render('circus.conf', config)
+    render('circus.service', config)
+    
     render('config.json', config)
     render('taiga-events.ini', config)
 

@@ -44,21 +44,26 @@ def load_config(f_name):
     config['FRONTEND_SRC_CONTAINER'] = '{0}/{1}'.format(
             HOME_TAIGA, config['FRONTEND_BASENAME'])
 
-    # #host中保存数据位置
-    # config['FRONTEND_DATA_HOST'] = os.path.abspath('./{0}'.format(config['FRONTEND_BASENAME']))
 
     #events
     config['EVENTS_GIT_REPO'] = config['events']['git-repo']
     config['EVENTS_CONFIG_HOST'] = os.path.abspath(
         config['events']['CONFIG_HOST'])
-    config['EVENTS_SRC_HOST'] = os.path.abspath(config['events']['SRC_HOST'])
-
+    #git clone的工作路径
+    config['EVENTS_SRC_HOST_BASE'] = os.path.abspath(
+        config['events']['SRC_BASE'])
+    #git repo工程名
+    config['EVENTS_BASENAME'] = config['events']['BASENAME']
+    #git 后的路径
+    config['EVENTS_SRC_HOST'] = '{0}/{1}'.format(
+        config['EVENTS_SRC_HOST_BASE'], config['EVENTS_BASENAME'])
+    #容器中工程位置
     config['EVENTS_SRC_CONTAINER'] = '{0}/{1}'.format(
-        HOME_TAIGA, config['events']['SRC_CONTAINER'])
+        HOME_TAIGA, config['EVENTS_BASENAME'])
 
     config['EVENTS_PORT'] = config['events']['PORT']
 
-    #logs backend frontend 和 events 都挂到1个路径下
+    #logs 所有人的日志 都挂到1个路径下
     config['LOGS_CONTAINER'] = '{0}/logs'.format(HOME_TAIGA)
     config['LOGS_HOST'] = os.path.abspath('./logs')
 
@@ -67,7 +72,7 @@ def load_config(f_name):
 
 config = load_config('./setup-config.yml')
 
-print(config['BACKEND_MEDIA_HOST'])
+#print(config['BACKEND_MEDIA_HOST'])
 
 #config['TAIGA_HOSTNAME'] = '192.168.239.129'
 
@@ -77,6 +82,15 @@ build_config.docker_compose(config)
 build_config.backend(config)
 build_config.frontend(config)
 build_config.events(config)
+
+
+SERVICE_NAME = config['EVENTS_SERVER']
+#print(config['EVENTS_SRC_CONTAINER'])
+
+build_config.util.remove_image(SERVICE_NAME)
+# CONTEXT = config['events']['CONFIG_HOST']
+# build_config.util.build_image(CONTEXT, SERVICE_NAME)
+# build_config.util.run_container(SERVICE_NAME)
 
 #subprocess.run('docker-compose up', shell=True)
 #print(config['BACKEND_SRC_CONTAINER'])

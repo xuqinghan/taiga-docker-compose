@@ -1,4 +1,5 @@
 FROM node
+#node 基于debian默认找不到circus
 LABEL author="xuqinghan"
 LABEL purpose = 'taiga-events'
 
@@ -6,11 +7,25 @@ RUN mkdir /taiga_events
 WORKDIR /taiga_events
 
 
-RUN curl https://bootstrap.pypa.io/get-pip.py | python
-RUN apt-get update
-RUN apt install -y build-essential python-dev
+#node镜像 apt 找不到 circus 只能用pip装
 
+
+# RUN curl https://bootstrap.pypa.io/get-pip.py | python
+# RUN pip install circus
+
+
+RUN apt update
+#RUN curl -sL https://deb.nodesource.com/setup_8.x | -E bash -
+#RUN apt install -y nodejs
+RUN apt install -y upstart 
+RUN apt install -y systemd systemd-sysv 
+RUN apt install -y software-properties-common
+RUN apt install -y build-essential python-dev python-pip
+RUN apt install -y libzmq-dev libevent-dev 
+# RUN add-apt-repository ppa:roman-imankulov/circus
+# RUN apt-get update
 RUN pip install circus
+
 # coffee used in circus
 RUN npm install -g coffee-script
 
@@ -18,12 +33,27 @@ RUN groupadd -r taiga && useradd -r -g taiga taiga
 
 RUN npm install --production && npm install -g coffee-script
 
-#conf.json
-COPY config.json {{EVENT_SRC_CONTAINER}}/config.json
-#circus
-COPY taiga-events.ini /etc/circus/conf.d/taiga-events.ini
 
-CMD ['/usr/bin/circusd']
+RUN mkdir -p {{EVENTS_SRC_CONTAINER}}
+WORKDIR {{EVENTS_SRC_CONTAINER}}
+RUN mkdir -p {{LOGS_CONTAINER}}
+
+
+#conf.json
+COPY config.json {{EVENTS_SRC_CONTAINER}}/config.json
+#circus
+COPY taiga-events.ini /etc/circus/circusd.ini
+#upstart
+COPY circus.conf /etc/init/circus.conf
+#system
+COPY circus.service /etc/systemd/system/circus.service
+
+#code
+COPY ./src/taiga-events {{EVENTS_SRC_CONTAINER}}
+
+#RUN service circusd start
+CMD ["/usr/local/bin/circusd", "/etc/circus/circusd.ini"]
+#CMD ["/bin/bash"]
 
 # RUN chown -R taiga /taiga_events \
 #     && chown -R taiga /scripts/

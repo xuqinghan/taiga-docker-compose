@@ -96,6 +96,7 @@ services:
     events:
         build: events/
         volumes:
+            - /home/xuqinghan/dev/taiga-docker-compose/events/src/taiga-events:/home/taiga/taiga-events
             - /home/xuqinghan/dev/taiga-docker-compose/logs:/home/taiga/logs
         # entrypoint: ['/scripts/entrypoint.sh']
         # command: ['coffee', 'index.coffee']

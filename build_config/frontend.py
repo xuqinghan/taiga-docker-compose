@@ -25,7 +25,7 @@ def frontend(config):
     '''taiga frontend需要的配置文件'''
     #如果不存在，创建  配置文件根目录
     util.build_dir(config['FRONTEND_CONFIG_HOST'])
-
+    
     render('conf.json', config)
     render('nginx_front.conf', config)
     render('supervisord.conf', config)

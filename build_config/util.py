@@ -1,6 +1,7 @@
 from jinja2 import Template
 import os
 import shutil
+import subprocess
 
 dir_base = os.path.split(os.path.realpath(__file__))[0]
 
@@ -46,3 +47,33 @@ def copy_file(f_name_src, f_name_dest,config):
     f_name_src = '{0}/templates/{1}'.format(dir_base, f_name_src)
     f_name_dest = '{0}/{1}'.format(os.getcwd(), f_name_dest)
     os.popen('cp {0} {1}'.format(f_name_src, f_name_dest))
+
+
+def remove_image(service_name):
+    try:
+        subprocess.run('docker stop taigadockercompose_{0}_1'.format(
+            service_name), shell=True)
+    except:
+        pass
+    try:
+        subprocess.run('docker rm taigadockercompose_{0}_1'.format(
+            service_name), shell=True)
+    except:
+        pass
+    try:
+        subprocess.run('docker rmi taigadockercompose_{0}'.format(
+            service_name), shell=True)
+    except:
+        pass
+
+def build_image(docker_file_path, service_name):
+    cmd = 'docker build -t taigadockercompose_{1}:latest {0}'.format(
+        docker_file_path, service_name)
+    print(cmd)
+    subprocess.run(cmd, shell=True)
+
+
+def run_container(service_name):
+    cmd = 'docker run -it --name taigadockercompose_{0}_1 taigadockercompose_{0}:latest'.format(service_name)
+    print(cmd)
+    subprocess.run(cmd, shell=True)
