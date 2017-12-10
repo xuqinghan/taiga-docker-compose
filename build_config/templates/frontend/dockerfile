@@ -6,12 +6,9 @@ RUN apt update
 #RUN apt install -y nginx supervisor
 RUN apt install -y supervisor
 
-#src
+#src path
 RUN mkdir -p {{FRONTEND_SRC_CONTAINER}}
 WORKDIR {{FRONTEND_SRC_CONTAINER}}
-
-#conf.json
-COPY conf.json {{FRONTEND_SRC_CONTAINER}}/dist/conf.json
 
 #log
 RUN mkdir -p {{LOGS_CONTAINER}}
@@ -32,8 +29,12 @@ RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 RUN mkdir -p /var/log/supervisor
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
+# copy src all
 # COPY ./src/taiga-front-dist {{FRONTEND_SRC_CONTAINER}}
 # RUN chown -R nginx {{FRONTEND_SRC_CONTAINER}}
+
+#conf.json 
+#COPY conf.json {{FRONTEND_SRC_CONTAINER}}/dist/conf.json
 
 CMD ["/usr/bin/supervisord"]
 #CMD ["/bin/bash"]

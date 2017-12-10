@@ -1,7 +1,7 @@
 import yaml
 import build_config
 import os
-
+import subprocess
 
 
 def load_config(f_name):
@@ -76,6 +76,9 @@ config = load_config('./setup-config.yml')
 
 #config['TAIGA_HOSTNAME'] = '192.168.239.129'
 
+#remove "none" tag image
+subprocess.run('docker rmi $(docker images | grep "none")', shell=True)
+
 
 # build all config files for docker backend frontend...
 build_config.docker_compose(config)
@@ -84,14 +87,16 @@ build_config.frontend(config)
 build_config.events(config)
 
 
-SERVICE_NAME = config['EVENTS_SERVER']
-#print(config['EVENTS_SRC_CONTAINER'])
+# #SERVICE_NAME = config['EVENTS_SERVER']
+# SERVICE_NAME = 'frontend'
+# #print(config['EVENTS_SRC_CONTAINER'])
 
-build_config.util.remove_image(SERVICE_NAME)
-# CONTEXT = config['events']['CONFIG_HOST']
+# build_config.util.remove_container(SERVICE_NAME)
+# #build_config.util.remove_image(SERVICE_NAME)
+# CONTEXT = config['front_end']['CONFIG_HOST']
 # build_config.util.build_image(CONTEXT, SERVICE_NAME)
-# build_config.util.run_container(SERVICE_NAME)
+# # build_config.util.run_container(SERVICE_NAME)
 
-#subprocess.run('docker-compose up', shell=True)
+subprocess.run('docker-compose up', shell=True)
 #print(config['BACKEND_SRC_CONTAINER'])
 # docker run -itd -v /home/xuqinghan/taiga-docker-compose/backend/scripts:/scripts --name taigadockercompose_api_1 taigadockercompose_api

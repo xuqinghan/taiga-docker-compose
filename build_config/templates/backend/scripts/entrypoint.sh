@@ -11,7 +11,7 @@ if [[ $DB_CHECK_STATUS == "missing_django_migrations" ]]; then
   python {{BACKEND_SRC_CONTAINER}}/manage.py loaddata initial_user
   python {{BACKEND_SRC_CONTAINER}}/manage.py loaddata initial_project_templates
   python {{BACKEND_SRC_CONTAINER}}/manage.py compilemessages
-  python {{BACKEND_SRC_CONTAINER}}/manage.py sample_data
+  #python {{BACKEND_SRC_CONTAINER}}/manage.py sample_data
 fi
 #fi
 

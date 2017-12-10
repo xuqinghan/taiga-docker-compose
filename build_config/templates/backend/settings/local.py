@@ -43,7 +43,7 @@ DATABASES = {
     }
 }
 
-SECRET_KEY = {{SECRET_KEY}}
+SECRET_KEY = "{{SECRET_KEY}}"
 
 _HTTP = 'https' if env('TAIGA_SSL', cast=bool, default=False) else 'http'
 
@@ -51,13 +51,13 @@ SITES = {
     "api": {
        "scheme": _HTTP,
        #"domain": "{{TAIGA_HOSTNAME}}:{{BACKEND_PORT}}",
-       "domain": "{{TAIGA_HOSTNAME}},
+       "domain": "{{TAIGA_HOSTNAME}}",
        "name": "api"
     },
     "front": {
       "scheme": _HTTP,
       #"domain": "{{TAIGA_HOSTNAME}}:9001",
-      "domain": "{{TAIGA_HOSTNAME}},
+      "domain": "{{TAIGA_HOSTNAME}}",
       "name": "front"
     },
 }

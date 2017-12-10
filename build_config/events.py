@@ -9,6 +9,16 @@ def render(f_name_base, config):
     f_name_base = 'events/{0}'.format(f_name_base)
     return util.render(f_name_base, config)
 
+def render_to_src(f_name_base, config):
+    #加载模板
+    f_name_template = 'events/{0}'.format(f_name_base)
+    template = util.load_template(f_name_template)
+    #渲染
+    content_str = template.render(config)
+    #print(content_str)
+    #保存
+    f_name_src = 'events/src/taiga-events/{0}'.format(f_name_base)
+    util.save_txt(f_name_src, content_str)
 
 def get_src(config):
 
@@ -21,6 +31,14 @@ def get_src(config):
         # subprocess.run('docker rmi taigadockercompose_api', shell=True)
 
 
+def image_container(config):
+    SERVICE_NAME = 'events'
+
+    util.remove_container(SERVICE_NAME)
+    util.remove_image(SERVICE_NAME)
+    CONTEXT = config['events']['CONFIG_HOST']
+    #util.build_image(CONTEXT, SERVICE_NAME)
+    #util.run_container(SERVICE_NAME)
 
 
 
@@ -32,7 +50,6 @@ def events(config):
     render('circus.conf', config)
     render('circus.service', config)
     
-    render('config.json', config)
     render('taiga-events.ini', config)
 
     #docker image
@@ -42,3 +59,6 @@ def events(config):
 
     #下载taiga-back git源码
     get_src(config)
+    #config是源码的一部分
+    render_to_src('config.json', config)
+    image_container(config)

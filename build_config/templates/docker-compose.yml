@@ -23,7 +23,7 @@ services:
         #restart: always
         #build: rabbitmq/
         image: rabbitmq:3-management
-        #hostname: rabbit-taiga
+        hostname: {{RABBITMQ_HOSTNAME}}
         environment:
             RABBITMQ_ERLANG_COOKIE: SWQOKODSQALRPCLNMEQG
             #RABBITMQ_NODENAME: taiga
@@ -32,7 +32,7 @@ services:
             #RABBITMQ_DEFAULT_VHOST: taiga
         ports:
             - 15672:15672
-            # - "5672:5672"
+            - 5672:5672
 
     {{API_SERVER}}:
         build: backend/
@@ -53,8 +53,8 @@ services:
         depends_on:
             - {{POSTGRES_SERVER}}
         # entrypoint: ["~/wait-for-postgres.sh", "{{POSTGRES_SERVER}}", "~/scripts/entrypoint.sh"]
-        # command: ['gunicorn', '-b', '0.0.0.0:{{BACKEND_PORT}}', 'taiga.wsgi']
-        command: ['/usr/bin/circusd']
+        command: ['gunicorn', '-b', '0.0.0.0:{{BACKEND_PORT}}', 'taiga.wsgi']
+        #command: ["/usr/local/bin/circusd", "/etc/circus/circusd.ini"]
 
     frontend:
         build: frontend/
@@ -96,7 +96,7 @@ services:
     {{EVENTS_SERVER}}:
         build: events/
         volumes:
-            - {{EVENTS_SRC_HOST}}:{{EVENTS_SRC_CONTAINER}}
+            #- {{EVENTS_SRC_HOST}}:{{EVENTS_SRC_CONTAINER}}
             - {{LOGS_HOST}}:{{LOGS_CONTAINER}}
         # entrypoint: ['/scripts/entrypoint.sh']
         # command: ['coffee', 'index.coffee']

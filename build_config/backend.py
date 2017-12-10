@@ -58,6 +58,14 @@ def get_src(config):
         subprocess.run('docker rmi taigadockercompose_api', shell=True)
 
 
+def image_container(config):
+    SERVICE_NAME = 'api'
+
+    util.remove_container(SERVICE_NAME)
+    #util.remove_image(SERVICE_NAME)
+    CONTEXT = config['back_end']['CONFIG_HOST']
+    #util.build_image(CONTEXT, SERVICE_NAME)
+    #util.run_container(SERVICE_NAME)
 
 def backend(config):
     '''taiga backend需要的配置文件'''
@@ -84,3 +92,6 @@ def backend(config):
 
     #自己修正源码中bug
     copy_settings__init__(config)
+
+    #清除容器 镜像，重建
+    image_container(config)

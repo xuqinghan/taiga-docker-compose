@@ -13,8 +13,8 @@ RUN apt install -y automake libtool libffi-dev curl git tmux gettext
 RUN apt install -y nginx
 RUN apt install -y libxml2-dev libxslt-dev
 RUN apt install -y libssl-dev libffi-dev
-RUN apt install circus
-
+# only pip can install circus
+RUN pip install circus
 RUN pip install setuptools
 RUN pip install gunicorn
 
@@ -50,7 +50,8 @@ COPY wait-for-postgres.sh /wait-for-postgres.sh
 RUN chmod +x /wait-for-postgres.sh
 
 # Setup circus
-COPY taiga.ini /etc/circus/conf.d/taiga.ini
+#COPY circus.conf /etc/init/circus.conf
+COPY taiga.ini /etc/circus/circusd.ini
 #RUN service circusd restart
 RUN pip install django-environ
 
@@ -58,5 +59,9 @@ COPY ./src/taiga-back {{BACKEND_SRC_CONTAINER}}
 RUN chown -R taiga {{BACKEND_SRC_CONTAINER}}
 #USER taiga
 #first run
-ENTRYPOINT ["/scripts/entrypoint.sh"]
 
+#RUN service circusd start
+ENTRYPOINT ["/scripts/entrypoint.sh"]
+# /usr/local/bin/circusd /etc/circus/circusd.ini
+#CMD ["/usr/local/bin/circusd", "/etc/circus/circusd.ini"]
+#CMD ["/bin/bash"]

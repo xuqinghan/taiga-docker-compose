@@ -49,7 +49,7 @@ def copy_file(f_name_src, f_name_dest,config):
     os.popen('cp {0} {1}'.format(f_name_src, f_name_dest))
 
 
-def remove_image(service_name):
+def remove_container(service_name):
     try:
         subprocess.run('docker stop taigadockercompose_{0}_1'.format(
             service_name), shell=True)
@@ -60,6 +60,10 @@ def remove_image(service_name):
             service_name), shell=True)
     except:
         pass
+
+
+def remove_image(service_name):
+
     try:
         subprocess.run('docker rmi taigadockercompose_{0}'.format(
             service_name), shell=True)

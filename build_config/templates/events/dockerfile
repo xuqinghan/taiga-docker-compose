@@ -39,8 +39,7 @@ WORKDIR {{EVENTS_SRC_CONTAINER}}
 RUN mkdir -p {{LOGS_CONTAINER}}
 
 
-#conf.json
-COPY config.json {{EVENTS_SRC_CONTAINER}}/config.json
+
 #circus
 COPY taiga-events.ini /etc/circus/circusd.ini
 #upstart
@@ -50,7 +49,8 @@ COPY circus.service /etc/systemd/system/circus.service
 
 #code
 COPY ./src/taiga-events {{EVENTS_SRC_CONTAINER}}
-
+# copy in /src before docker build
+# COPY config.json {{EVENTS_SRC_CONTAINER}}/config.json
 #RUN service circusd start
 CMD ["/usr/local/bin/circusd", "/etc/circus/circusd.ini"]
 #CMD ["/bin/bash"]

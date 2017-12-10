@@ -1,5 +1,5 @@
-TAIGA_HOSTNAME: 127.0.0.1
-SECRET_KEY: aw3+t2r(8(0kkrhg8)gx6i96v5^kv%6cfep9wxfom0%7dy0m9e
+TAIGA_HOSTNAME: 192.168.1.152
+SECRET_KEY: fasdfadsg3qret34542fgvfd
 
 
 RE_CLONE_SRC_FROM_GIT: False
@@ -12,7 +12,7 @@ back_end:
   SRC_HOST: ./backend/src
   SRC_CONTAINER: /taiga-back
   DATA_HOST: ./taiga-back
-  PORT: 8001
+  PORT: 8000
 API_SERVER: api
 
 front_end:
@@ -38,6 +38,7 @@ POSTGRES_PASSWORD: taiga
 POSTGRES_VOLUMN_PATH: ./db/postgres
 
 RABBITMQ_SERVER: rabbitmq
+RABBITMQ_HOSTNAME: mymq
 RABBITMQ_DEFAULT_USER: taiga
 RABBITMQ_DEFAULT_PASS: taiga
 
