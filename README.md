@@ -1,6 +1,7 @@
 # deploy taiga in docker via one command:
 
-```pip3 install jinja2
+```bash
+pip3 install jinja2
 python3 setup.py
 ```
 
